@@ -76,7 +76,7 @@ export default function Home() {
             fontWeight: "bold"
           }
         }}
-        style={{ padding: 30 }}
+        style={{ padding: 30, marginBottom: 30 }}
         title="Expenses"
         columns={columns}
         data={expenses}
