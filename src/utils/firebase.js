@@ -1,26 +1,26 @@
 import { db } from "../firebase";
 
-export const getDispesas = async () => {
-  const response = db.collection("dispesas");
-  const data = await response.get();
-  const docs = data.docs.map(doc => {
-    return {
-      id: doc.id,
-      valor: doc.data().valor,
-      descricao: doc.data().descricao,
-      data: doc.data().data,
-      pago: doc.data().pago,
-      rs: doc.data().rs
-    };
+// Create
+export const addExpense = e => {
+  db.collection("expenses").add({
+    ...e,
+    date: new Date(e.date).toISOString()
   });
-
-  return docs;
 };
 
-export const deleteDispesas = e => {
-  db.collection("dispesas")
+// Delete
+export const deleteExpense = e => {
+  db.collection("expenses")
     .doc(e)
     .delete();
+};
 
-  getDispesas();
+// Update
+export const updateExpense = e => {
+  db.collection("expenses")
+    .doc(e.id)
+    .update({
+      ...e,
+      date: new Date(e.date).toISOString()
+    });
 };

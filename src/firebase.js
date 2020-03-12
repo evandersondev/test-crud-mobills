@@ -1,14 +1,14 @@
 import * as firebase from "firebase";
 
 const config = {
-  apiKey: "AIzaSyAsZPyFWiqjjA1GRyPb43607MW8TNy_Ekc",
-  authDomain: "crud-mobills.firebaseapp.com",
-  databaseURL: "https://crud-mobills.firebaseio.com",
-  projectId: "crud-mobills",
-  storageBucket: "crud-mobills.appspot.com",
-  messagingSenderId: "356828338513",
-  appId: "1:356828338513:web:f1bef7ac3300e8da6c9b70",
-  measurementId: "G-G8Y7TX4PYE"
+  apiKey: "AIzaSyAfXmvNXB8TOccC5GuaQ0OpFoPOp38CKVw",
+  authDomain: "control-of-expenses.firebaseapp.com",
+  databaseURL: "https://control-of-expenses.firebaseio.com",
+  projectId: "control-of-expenses",
+  storageBucket: "control-of-expenses.appspot.com",
+  messagingSenderId: "868268168166",
+  appId: "1:868268168166:web:daa63cff1a78178c0cbc27",
+  measurementId: "G-FKY5H6WDNB"
 };
 
 firebase.initializeApp(config);

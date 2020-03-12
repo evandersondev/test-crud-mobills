@@ -1,125 +1,108 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from "react";
-import { Container } from "@material-ui/core";
+import { Container, Card, CardContent, Typography } from "@material-ui/core";
 import MaterialTable from "material-table";
 import { useSelector, useDispatch } from "react-redux";
+import { CardContainer } from "./styles";
 
+// Actions
+import addExpensesAction from "../../store/actions/addExpensesAction";
+
+//utils
+import columns from "../../utils/columns";
+import { addExpense, deleteExpense, updateExpense } from "../../utils/firebase";
+import { filterPaid, filterExpense } from "../../utils/filterPaidAndExpense";
+
+//firebase
 import { db } from "../../firebase";
 
 export default function Home() {
-  const dispesas = useSelector(state => state.dispesas);
   const dispatch = useDispatch();
+  const expenses = useSelector(state => state.expenses);
 
-  const columns = [
-    { title: "Descricao", field: "descricao" },
-    { title: "Data", field: "data", type: "date" },
-    {
-      title: "",
-      field: "rs",
-      editable: "never",
-      initialEditValue: "R$",
-      type: "numeric"
-    },
-    { title: "Valor", field: "valor", type: "numeric" },
-    {
-      title: "Pago",
-      field: "pago",
-      lookup: { 10: "Sim", 11: "Nao" }
-    }
-  ];
-
-  // Create
-  const addDispesas = e => {
-    db.collection("dispesas").add({
-      ...e,
-      data: new Date().getTime()
-    });
-    getDispesas();
-  };
-
-  const addDispesasAction = dispesas => {
-    return { type: "GET_DISPESA", dispesas };
-  };
-
-  // Delete
-  const deleteDispesas = e => {
-    db.collection("dispesas")
-      .doc(e)
-      .delete();
-
-    getDispesas();
-  };
-
-  // Update
-  const updateDispesas = e => {
-    db.collection("dispesas")
-      .doc(e.id)
-      .update({
-        ...e,
-        data: new Date(e.data).getTime()
-      });
-
-    getDispesas();
-  };
-
-  // Read
-  const getDispesas = async () => {
-    const response = db.collection("dispesas");
+  //Read
+  const getExpenses = async () => {
+    const response = db.collection("expenses");
     const data = await response.get();
     const docs = data.docs.map(doc => {
       return {
         id: doc.id,
-        valor: doc.data().valor,
-        descricao: doc.data().descricao,
-        data: new Date(doc.data().data).toLocaleDateString("pt-BR"), // doc.data().data,
-        pago: doc.data().pago,
+        value: doc.data().value,
+        description: doc.data().description,
+        date: new Date(doc.data().date).toLocaleString("en-ZA", {
+          dateStyle: "short"
+        }),
+        paid: doc.data().paid,
         rs: doc.data().rs
       };
     });
-
-    dispatch(addDispesasAction(docs));
-    return;
+    dispatch(addExpensesAction(docs));
   };
 
   useEffect(() => {
-    getDispesas();
+    getExpenses();
   }, []);
 
-  // const convertMoney = money => {
-  //   var real = money.toLocaleString("pt-br", {
-  //     style: "currency",
-  //     currency: "BRL"
-  //   });
-  //   return real;
-  // };
-
   return (
-    <Container style={{ marginTop: 60 }}>
+    <Container>
+      <CardContainer>
+        <Card className="card">
+          <CardContent>
+            <Typography variant="subtitle1" component="h2">
+              Total Paid
+            </Typography>
+            <Typography variant="h4" component="h2">
+              {filterPaid(expenses)}
+            </Typography>
+          </CardContent>
+        </Card>
+
+        <Card className="card" id="cardExpenses">
+          <CardContent>
+            <Typography variant="subtitle1" component="h2">
+              Total Expenses
+            </Typography>
+            <Typography variant="h4" component="h2">
+              {filterExpense(expenses)}
+            </Typography>
+          </CardContent>
+        </Card>
+      </CardContainer>
       <MaterialTable
+        options={{
+          pageSizeOptions: [8],
+          headerStyle: {
+            background: "#ffc000",
+            color: "#fff",
+            fontWeight: "bold"
+          }
+        }}
         style={{ padding: 30 }}
-        title="Controle de Dispesas"
+        title="Expenses"
         columns={columns}
-        data={dispesas}
+        data={expenses}
         editable={{
           onRowAdd: e =>
             new Promise(resolve => {
               setTimeout(() => {
-                addDispesas(e);
+                addExpense(e);
                 resolve();
+                getExpenses();
               }, 1000);
             }),
           onRowUpdate: e =>
             new Promise(resolve => {
               setTimeout(() => {
-                updateDispesas(e);
+                updateExpense(e);
                 resolve();
+                getExpenses();
               }, 1000);
             }),
           onRowDelete: e =>
             new Promise(resolve => {
               setTimeout(() => {
-                deleteDispesas(e.id);
+                deleteExpense(e.id);
                 resolve();
+                getExpenses();
               }, 1000);
             })
         }}
